@@ -54,7 +54,7 @@
    3. 欲建立连接的两个进程各自有一个socket来标识，那么这两个socket组成的socket pair就唯一标识一个连接。  
    4. Socket来描述网络连接的一对一关系。  
    5. 常用的Socket类型有两种：流式Socket（SOCK_STREAM）和数据报式Socket()SOCK_DGRAM)
-        - 流式是一种面向连接的Socket，针对于面向连接的TCP服务应用；  
+         - 流式是一种面向连接的Socket，针对于面向连接的TCP服务应用；  
          - 据报式Socket是一种无连接的Socket，对应于无连接的UDP服务应用。     
    6. 关于通信：  
    mac地址（不需要用户指定） (ARP 协议)Ip ——> mac  
@@ -62,3 +62,32 @@
    port 端口号 （需要用户指定） —— 确定程序  
    不能使用系统占用的默认端口。 5000+ 端口我们使用 （8080）  
    65535为端口上限。
+5. TCP:CS开发架构
+    - 代码层面   
+    ![CS开发架构1](src\main\resources\pics\CS开发架构1.png)![CS开发架构2](src\main\resources\pics\CS开发架构2.png)
+    - TCP通信过程  
+        - 三次握手：  
+            - 主动发起请求端， 发送 SYN   
+            - 被动建立连接请求端 ， 应答ACK 同时 发送 SYN  
+            - 主动发起请求端，发送应答 ACK  
+              标志 TCP 三次握手建立完成。 —— server：Accept() 返回 。— client：Dial() 返回。  
+    	  
+        - 四次挥手：  
+            - 主动关闭连接请求端， 发送 FIN  
+            - 被动关闭连接请求端 ，应答 ACK    
+                            标志。半关闭完成。 —— close()
+            - 被动关闭连接请求端 ，发送 FIN
+            -  主动关闭连接请求端，应答 ACK  
+                            标志。四次挥手建立完成。 —— close().
+        - ![TCP通信过程](src\main\resources\pics\TCP通信过程.png)
+        - ![三次握手和四次挥手](src\main\resources\pics\三次握手和四次挥手.png)
+    - TCP深入机制
+        - ![TCP状态转换](src\main\resources\pics\TCP状态转换.png)
+        - TCP转换图解析：  
+          1,主动发起连接请求端口close>完成三次握手>EATABLISEHED(数据通信状态)> Dial()函数返回  
+          2,被动发起连接请求端： CLOSED > 调用Accept()函数>LISTEN 完成三次握手 >ESTABLISEHED （数据通信状态）>Accept()函数返回>数据传递期间 —— ESTABLISEHED （数据通信状态）  
+          主动关闭连接请求端：ESTABLISEHED>FIN_WAIT_2 (半关闭）>TIME_WAIT >2MSL >确认最后一
+          个ACK被对端成功接收>CLOSE>半关闭、TIME_WAIT、2MSL
+          只会出现在 “主动关闭连接请求端”
+          
+          被动关闭连接请求端：ESTABLISEHED>CLOSE
